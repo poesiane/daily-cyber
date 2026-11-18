@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily News Cyber - CEC EDF</title>
+    <!-- Tailwind CSS pour un design propre et moderne -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen p-4 font-mono">
+    
+    <div class="max-w-md mx-auto">
+        <!-- En-tête -->
+        <header class="border-b border-emerald-500/30 pb-4 mb-6 text-center">
+            <h1 class="text-xl font-bold text-emerald-400 tracking-wider">⚡ DAILY NEWS CYBER</h1>
+            <p class="text-xs text-slate-400 mt-1">CEC EDF Rennes • Édition quotidienne</p>
+        </header>
+
+        <!-- Section Aujourd'hui -->
+        <section id="today-news" class="bg-slate-900 border border-emerald-500/20 rounded-xl p-4 mb-6 shadow-lg shadow-emerald-950/20">
+            <div class="flex justify-between items-center mb-3">
+                <span id="current-date" class="text-xs bg-emerald-950 text-emerald-400 px-2.5 py-1 rounded border border-emerald-800">Chargement...</span>
+                <a id="pdf-link-today" href="#" target="_blank" class="hidden text-xs bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded font-semibold transition">📥 Télécharger PDF</a>
+            </div>
+            
+            <div id="content-body" class="text-sm space-y-4 text-slate-300">
+                <p class="animate-pulse text-slate-500">Génération de la news du jour en cours...</p>
+            </div>
+        </section>
+
+        <!-- Section Archives -->
+        <section>
+            <h2 class="text-sm font-semibold text-slate-400 mb-3 uppercase tracking-wider">📁 Archives précédentes</h2>
+            <div id="archives-list" class="space-y-2">
+                <!-- Les archives s'injecteront ici -->
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Script pour charger dynamiquement les news depuis un fichier JSON stocké sur ton GitHub
+        async function loadNews() {
+            try {
+                // Remplace cette URL par le lien brut de ton futur fichier data.json sur GitHub
+                const response = await fetch('data.json');
+                const data = await response.json();
+                
+                if(data && data.length > 0) {
+                    const latest = data[0];
+                    document.getElementById('current-date').innerText = latest.date;
+                    document.getElementById('content-body').innerHTML = latest.htmlContent;
+                    
+                    const pdfBtn = document.getElementById('pdf-link-today');
+                    if(latest.pdfUrl) {
+                        pdfBtn.href = latest.pdfUrl;
+                        pdfBtn.classList.remove('hidden');
+                    }
+
+                    // Archives
+                    const archivesContainer = document.getElementById('archives-list');
+                    archivesContainer.innerHTML = '';
+                    data.slice(1).forEach(item => {
+                        archivesContainer.innerHTML += `
+                            <div class="bg-slate-900/60 border border-slate-800 p-3 rounded-lg flex justify-between items-center text-xs">
+                                <span class="text-slate-300">${item.date}</span>
+                                <a href="${item.pdfUrl}" target="_blank" class="text-emerald-400 hover:underline">📄 Voir le PDF</a>
+                            </div>
+                        `;
+                    });
+                }
+            } catch (e) {
+                document.getElementById('content-body').innerHTML = `<p class="text-red-400 text-xs">En attente de la première publication (ou fichier data.json introuvable).</p>`;
+            }
+        }
+        loadNews();
+    </script>
+</body>
+</html>
